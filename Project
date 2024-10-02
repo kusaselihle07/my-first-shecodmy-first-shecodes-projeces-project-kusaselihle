@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .weather-app {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .search-form-input {
+            padding: 10px;
+            width: 75%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .search-form-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #8064e9;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .weather-app-city {
+            font-size: 32px;
+            margin: 10px 0;
+        }
+
+        .weather-app-details {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .weather-app-temperature-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .weather-app-temperature {
+            font-size: 48px;
+            margin-right: 10px;
+        }
+
+        .weather-app-unit {
+            font-size: 24px;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #8064e9;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <title>Meteo App</title>
+</head>
+
+<body>
+    <div class="weather-app">
+        <header>
+            <form class="search-form" id="search-form">
+                <input type="search" placeholder="Enter a city..." required id="search-form-input" class="search-form-input">
+                <input type="submit" value="Search" class="search-form-button">
+            </form>
+        </header>
+
+        <main>
+            <div class="weather-app-data">
+                <div>
+                    <h1 class="weather-app-city" id="city">Weather</h1>
+                    <p class="weather-app-details">
+                        <span id="time"></span>,
+                        <span id="description">Description</span>
+                        <br>
+                        Humidity: <strong id="humidity">--</strong>%, Wind: <strong id="wind-speed">--</strong> km/h
+                    </p>
+                </div>
+                <div class="weather-app-temperature-container">
+                    <img id="icon" alt="Weather icon" width="50" height="50">
+                    <div class="weather-app-temperature" id="temperature">--</div>
+                    <div class="weather-app-unit">°C</div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            This project was coded by
+            <a href="https://github.com/Kusaselihle07" target="_blank">Kusaselihle Nene</a> and is
+            <a href="https://github.com/KusaselihleNene/meteo-app" target="_blank">open-sourced on GitHub</a> and
+            <a href="https://meteo-kusaselihle07.netlify.app/" target="_blank">hosted on Netlify</a>.
+        </footer>
+    </div>
+
+    <script>
+        const apiKey = '269b1b60accc8b461b6a352e60ca6853';  // Your OpenWeatherMap API Key
+        const form = document.getElementById('search-form');
+        const input = document.getElementById('search-form-input');
+        const cityElement = document.getElementById('city');
+        const descriptionElement = document.getElementById('description');
+        const humidityElement = document.getElementById('humidity');
+        const windSpeedElement = document.getElementById('wind-speed');
+        const temperatureElement = document.getElementById('temperature');
+        const iconElement = document.getElementById('icon');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const city = input.value.trim();
+            if (city) {
+                fetchWeatherData(city);
+            }
+        });
+
+        function fetchWeatherData(city) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+            axios.get(url)
+                .then(response => {
+                    const weatherData = response.data;
+                    cityElement.textContent = weatherData.name;
+                    descriptionElement.textContent = weatherData.weather[0].description;
+                    humidityElement.textContent = weatherData.main.humidity;
+                    windSpeedElement.textContent = weatherData.wind.speed;
+                    temperatureElement.textContent = Math.round(weatherData.main.temp);
+                    const iconCode = weatherData.weather[0].icon;
+                    iconElement.src = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    cityElement.textContent = 'City not found';
+                    descriptionElement.textContent = '';
+                    humidityElement.textContent = '--';
+                    windSpeedElement.textContent = '--';
+                    temperatureElement.textContent = '--';
+                    iconElement.src = '';
+                });
+        }
+    </script>
+</body>
+
+</html>
